@@ -1,5 +1,6 @@
 import Layout from '../../components/Layout';
 import { Typography } from '@mui/material';
+import withAuth from '../auth/withAuth';
 
 const AdminDashboard = () => {
   return (
@@ -14,4 +15,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default withAuth(AdminDashboard, ['ADMIN']);

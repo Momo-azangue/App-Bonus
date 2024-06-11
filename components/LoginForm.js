@@ -1,8 +1,45 @@
-import React from 'react';
+import React,  { useState }  from 'react';
 import { Container, Box, TextField, Button, Typography } from '@mui/material';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const LoginForm = () => {
+
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('/api/auth/signin', { username, password });
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+
+      // Extraire les rôles depuis le token
+      const roles = getRolesFromToken(token);
+
+      // Rediriger en fonction du rôle
+      if (roles.includes('ADMIN')) {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/user/dashboard');
+      }
+    } catch (error) {
+      setError('Échec de la connexion. Vérifiez vos identifiants.');
+    }
+  };
+
+  const getRolesFromToken = (token) => {
+    const decodedToken = jwt_decode(token);
+    return decodedToken.roles || [];
+  };
+
+
+
+
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -16,16 +53,18 @@ const LoginForm = () => {
         <Typography component="h1" variant="h5">
           Se connecter
         </Typography>
-        <Box component="form" noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="E-mail"
-            name="email"
-            autoComplete="email"
+            id="username"
+            label="username"
+            name="username"
+            autoComplete="username"
             autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
             margin="normal"
@@ -36,7 +75,11 @@ const LoginForm = () => {
             type="password"
             id="password"
             autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
+           {error && <Typography color="error">{error}</Typography>}
+
           <Link href="/auth/forgot-password" passHref>
             <Typography variant="body2" color="primary" component="span">
               Mot de passe oublié?
