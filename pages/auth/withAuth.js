@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+
 
 const withAuth = (WrappedComponent, requiredRoles) => {
   return (props) => {
@@ -22,7 +23,7 @@ const withAuth = (WrappedComponent, requiredRoles) => {
     }, []);
 
     const getRolesFromToken = (token) => {
-      const decodedToken = jwt_decode(token);
+      const decodedToken = jwtDecode(token);
       return decodedToken.roles || [];
     };
 

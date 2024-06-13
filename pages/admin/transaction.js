@@ -3,6 +3,7 @@ import Layout from '../../components/Layout';
 import { Container, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import axiosInstance from '../../config/axiosConfig';
+import api from '../../config/axiosConfig';
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +11,7 @@ const Transactions = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axiosInstance.get('/api/transactions');
+        const response = await api.get('/api/transactions/all-transaction');
         setTransactions(response.data);
       } catch (error) {
         console.error('Error fetching transactions:', error);

@@ -3,6 +3,7 @@ import { Box, Button, TextField, Typography, Container } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
+import api from '../config/axiosConfig';
 
 
 const RegisterForm = () => {
@@ -16,7 +17,7 @@ const RegisterForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/api/auth/signup', {
+      const response = await api.post('/api/auth/signup', {
         email,
         password,
         firstName,
@@ -29,7 +30,7 @@ const RegisterForm = () => {
       localStorage.setItem('token', token);
 
       // Redirect user after successful registration
-      router.push('/users/index');
+      router.push('/auth/login');
     } catch (error) {
       setError('Échec de l\'inscription. Vérifiez vos informations.');
     }
