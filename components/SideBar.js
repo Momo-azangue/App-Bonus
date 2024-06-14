@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import RuleIcon from '@mui/icons-material/Rule';
 import HistoryIcon from '@mui/icons-material/History';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
-import AbcIcon from '@mui/icons-material/Abc';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
@@ -14,6 +13,11 @@ const drawerWidth = 240;
 
 const SideBar = () => {
   const router = useRouter();
+  const [selectedPath, setSelectedPath] = useState('');
+
+  useEffect(() => {
+    setSelectedPath(router.pathname);
+  }, [router.pathname]);
 
   const menuItems = [
     { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/admin/utilisateurs' },
@@ -22,8 +26,12 @@ const SideBar = () => {
     { text: 'Historiques', icon: <HistoryIcon />, path: '/admin/historiques' },
     { text: 'Transactions', icon: <MonetizationOnIcon />, path: '/admin/transaction' },
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
-
   ];
+
+  const handleItemClick = (path) => {
+    setSelectedPath(path);
+    router.push(path);
+  };
 
   return (
     <Drawer
@@ -35,15 +43,23 @@ const SideBar = () => {
       }}
     >
       <Toolbar
-      
-      sx={{
-        paddingTop: 15,
-      }}/>
-      <List
-      
-     >
+        sx={{
+          paddingTop: 15,
+        }}
+      />
+      <List>
         {menuItems.map((item) => (
-          <ListItem button key={item.text} onClick={() => router.push(item.path)} sx={{ marginBottom: 3 ,'&:hover': { backgroundColor: 'black', color: '#fff' } }}>
+          <ListItem
+            button
+            key={item.text}
+            onClick={() => handleItemClick(item.path)}
+            sx={{
+              marginBottom: 3,
+              backgroundColor: selectedPath === item.path ? 'black' : 'inherit',
+              color: selectedPath === item.path ? '#fff' : 'inherit',
+              '&:hover': { backgroundColor: 'black', color: '#fff' },
+            }}
+          >
             <ListItemIcon sx={{ color: 'inherit' }}>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
