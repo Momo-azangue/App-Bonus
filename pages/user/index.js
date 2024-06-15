@@ -1,19 +1,19 @@
-import withAuth from '../path/to/withAuth';
-import Layout from '../../components/Layout';
+
+import ULayout from '../../components/components-user/ULayout';
 import { Typography } from '@mui/material';
 
 const UserDashboard = () => {
     return (
-        <Layout>
+        <ULayout>
           <Typography variant="h4" gutterBottom>
-            Dashboard Admin
+            Dashboard User
           </Typography>
           <Typography>
             Bienvenue dans le tableau de bord de l'utilisateur.
           </Typography>
-        </Layout>
+        </ULayout>
       );
     };
     
 
-export default withAuth(UserDashboard, ['USER']);
+export default UserDashboard;

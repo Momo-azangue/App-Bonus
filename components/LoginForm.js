@@ -38,7 +38,7 @@ const LoginForm = () => {
           if (roles.includes('ADMIN')) {
               router.push('/admin/dashboard');
           } else {
-              router.push('/user/dashboard');
+              router.push('/admin/dashboard');
           }
       } catch (error) {
           setError('Échec de la connexion. Vérifiez vos identifiants.');
