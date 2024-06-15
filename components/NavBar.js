@@ -1,4 +1,3 @@
-// components/NavBar.js
 import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -34,9 +33,15 @@ const NavBar = () => {
       console.error('No refresh token found');
       return;
     }
-  
+
     try {
-      await api.delete('/api/auth/signout', { data: { refreshToken } });
+      await api.delete('/api/auth/signout', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: { refreshToken: refreshToken }
+      });
+      
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       console.log('Logout successful');
@@ -47,8 +52,6 @@ const NavBar = () => {
       handleClose();
     }
   };
-  
-  
 
   return (
     <>

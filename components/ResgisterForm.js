@@ -9,8 +9,9 @@ import api from '../config/axiosConfig';
 const RegisterForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
+  const [nom, setNom] = useState('');
+  const [prenom, setPrenom] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -18,11 +19,12 @@ const RegisterForm = () => {
     event.preventDefault();
     try {
       const response = await api.post('/api/auth/signup', {
+        username,
+        nom,
+        prenom,
         email,
         password,
-        firstName,
-        lastName,
-        roles: ["USER"] // You can set roles dynamically based on the user's choice
+        roles: ["ADMIN"] // You can set roles dynamically based on the user's choice
       });
 
       // Assuming the backend returns a JWT token upon successful registration
@@ -41,6 +43,18 @@ const RegisterForm = () => {
       <Box sx={{ marginTop: 22, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5">S'inscrire</Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+
+        <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="family-name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
           <TextField
             margin="normal"
             required
@@ -49,8 +63,8 @@ const RegisterForm = () => {
             label="Prénom"
             name="firstName"
             autoComplete="given-name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={prenom}
+            onChange={(e) => setPrenom(e.target.value)}
             autoFocus
           />
           <TextField
@@ -61,8 +75,8 @@ const RegisterForm = () => {
             label="Nom de famille"
             name="lastName"
             autoComplete="family-name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
           />
           <TextField
             margin="normal"

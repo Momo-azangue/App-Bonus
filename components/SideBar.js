@@ -6,6 +6,8 @@ import HistoryIcon from '@mui/icons-material/History';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+
 
 import { useRouter } from 'next/router';
 
@@ -22,6 +24,7 @@ const SideBar = () => {
   const menuItems = [
     { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/admin/utilisateurs' },
     { text: 'Règles', icon: <RuleIcon />, path: '/admin/regles' },
+    { text: 'Recompenses', icon: <EmojiEventsIcon />, path: '/admin/reward' },
     { text: 'Points', icon: <PointOfSaleIcon />, path: '/admin/points' },
     { text: 'Historiques', icon: <HistoryIcon />, path: '/admin/historiques' },
     { text: 'Transactions', icon: <MonetizationOnIcon />, path: '/admin/transaction' },
