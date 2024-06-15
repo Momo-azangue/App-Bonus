@@ -54,7 +54,7 @@ const Transactions = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table>  
           </TableContainer>
         )}
       </Container>

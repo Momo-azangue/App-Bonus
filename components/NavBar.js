@@ -1,3 +1,4 @@
+// components/NavBar.js
 import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,6 +8,7 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import api from '../config/axiosConfig';
 
 const style = {
   position: 'absolute',
@@ -26,11 +28,27 @@ const NavBar = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleLogout = () => {
-    // Ajouter la logique de déconnexion ici
-    handleClose();
-    router.push('/auth/login');
+  const handleLogout = async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      console.error('No refresh token found');
+      return;
+    }
+  
+    try {
+      await api.delete('/api/auth/signout', { data: { refreshToken } });
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      console.log('Logout successful');
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      handleClose();
+    }
   };
+  
+  
 
   return (
     <>
@@ -58,9 +76,9 @@ const NavBar = () => {
           <Typography id="modal-description" sx={{ mt: 2 }}>
             Êtes-vous sûr de vouloir vous déconnecter ?
           </Typography>
-          <Box mt={3} display="flex" justifyContent="space-around" >
-            <Button variant="contained" color="primary" onClick={handleLogout} sx={{backgroundColor: "black"}} >Oui</Button>
-            <Button variant="contained" color="secondary" onClick={handleClose} sx={{backgroundColor: "purple"}}>Non</Button>
+          <Box mt={3} display="flex" justifyContent="space-around">
+            <Button variant="contained" color="primary" onClick={handleLogout} sx={{ backgroundColor: "black" }}>Oui</Button>
+            <Button variant="contained" color="secondary" onClick={handleClose} sx={{ backgroundColor: "purple" }}>Non</Button>
           </Box>
         </Box>
       </Modal>

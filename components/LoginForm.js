@@ -13,35 +13,50 @@ const LoginForm = () => {
     const router = useRouter();
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            const response = await api.post('/api/auth/signin', { username, password });
-
-            // Log the response data to inspect it
-            console.log("Response data:", response.data);
-
-            // Utilisez la bonne clé pour obtenir le token
-            const token = response.data.accessToken;
-            if (!token) {
-                throw new Error('Token not found in response');
-            }
-
-            localStorage.setItem('token', token);
-
-            // Extraire les rôles depuis le token
-            const roles = getRolesFromToken(token);
-
-            // Rediriger en fonction du rôle
-            if (roles.includes('ROLE_USER')) {
-                router.push('/admin/dashboard');
-            } else {
-                router.push('/admin/dashboard');
-            }
-        } catch (error) {
-            setError('Échec de la connexion. Vérifiez vos identifiants.');
-            console.error("Login error:", error);
-        }
-    };
+      event.preventDefault();
+      try {
+          const response = await api.post('/api/auth/signin', { username, password });
+  
+          // Log the response data to inspect it
+          console.log("Response data:", response.data);
+  
+          // Utilisez la bonne clé pour obtenir le accessToken et refreshToken
+          const accessToken = response.data.token;
+          const refreshToken = response.data.refreshToken;
+  
+          if (!accessToken || !refreshToken) {
+              throw new Error('Tokens not found in response');
+          }
+  
+          localStorage.setItem('token', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+  
+          // Extraire les rôles depuis le token (utilisez une fonction pour décoder le JWT et obtenir les rôles)
+          const roles = getRolesFromToken(accessToken);
+  
+          // Rediriger en fonction du rôle
+          if (roles.includes('ROLE_USER')) {
+              router.push('/admin/dashboard');
+          } else {
+              router.push('/admin/dashboard');
+          }
+      } catch (error) {
+          setError('Échec de la connexion. Vérifiez vos identifiants.');
+          console.error("Login error:", error);
+      }
+  };
+  
+  // // Fonction pour extraire les rôles depuis le token
+  // const getRolesFromToken = (token) => {
+  //     try {
+  //         const payload = JSON.parse(atob(token.split('.')[1]));
+  //         return payload.roles || [];
+  //     } catch (e) {
+  //         console.error("Error decoding token:", e);
+  //         return [];
+  //     }
+  // };
+  
 
     const getRolesFromToken = (token) => {
         const decodedToken = jwtDecode(token);
