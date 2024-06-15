@@ -8,7 +8,7 @@ const RulesPage = () => {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [currentRule, setCurrentRule] = useState({ name: '', description: '', montantMin: '', points: '' });
+  const [currentRule, setCurrentRule] = useState({ name: '', description: '', montantMin: '', points: '', createdByName: '' });
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const RulesPage = () => {
     fetchRules();
   }, []);
 
-  const handleOpenModal = (rule = { name: '', description: '', montantMin: '', points: '' }) => {
+  const handleOpenModal = (rule = { name: '', description: '', montantMin: '', points: '', createdByName: '' }) => {
     setCurrentRule(rule);
     setIsEditMode(Boolean(rule.id));
     setOpenModal(true);
@@ -33,7 +33,7 @@ const RulesPage = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setCurrentRule({ name: '', description: '', montantMin: '', points: '' });
+    setCurrentRule({ name: '', description: '', montantMin: '', points: '', createdByName: '' });
   };
 
   const handleChange = (e) => {
@@ -84,10 +84,10 @@ const RulesPage = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
-                  <TableCell>Nom</TableCell>
                   <TableCell>Description</TableCell>
                   <TableCell>Montant Minimum</TableCell>
                   <TableCell>Points</TableCell>
+                  <TableCell>Créé par</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -95,10 +95,10 @@ const RulesPage = () => {
                 {rules.map((rule) => (
                   <TableRow key={rule.id}>
                     <TableCell>{rule.id}</TableCell>
-                    <TableCell>{rule.name}</TableCell>
                     <TableCell>{rule.description}</TableCell>
                     <TableCell>{rule.montantMin}</TableCell>
                     <TableCell>{rule.points}</TableCell>
+                    <TableCell>{rule.createdByName}</TableCell>
                     <TableCell>
                       <IconButton color="primary" onClick={() => handleOpenModal(rule)}>
                         <Edit />
@@ -120,15 +120,7 @@ const RulesPage = () => {
               {isEditMode ? 'Modifier' : 'Ajouter'} une Règle
             </Typography>
             <form onSubmit={handleSubmit}>
-              <TextField
-                label="Nom"
-                name="name"
-                value={currentRule.name}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-              />
+            
               <TextField
                 label="Description"
                 name="description"

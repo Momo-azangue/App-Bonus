@@ -35,10 +35,10 @@ const LoginForm = () => {
           const roles = getRolesFromToken(accessToken);
   
           // Rediriger en fonction du rôle
-          if (roles.includes('ROLE_USER')) {
+          if (roles.includes('ADMIN')) {
               router.push('/admin/dashboard');
           } else {
-              router.push('/admin/dashboard');
+              router.push('/user/dashboard');
           }
       } catch (error) {
           setError('Échec de la connexion. Vérifiez vos identifiants.');
@@ -46,17 +46,7 @@ const LoginForm = () => {
       }
   };
   
-  // // Fonction pour extraire les rôles depuis le token
-  // const getRolesFromToken = (token) => {
-  //     try {
-  //         const payload = JSON.parse(atob(token.split('.')[1]));
-  //         return payload.roles || [];
-  //     } catch (e) {
-  //         console.error("Error decoding token:", e);
-  //         return [];
-  //     }
-  // };
-  
+ 
 
     const getRolesFromToken = (token) => {
         const decodedToken = jwtDecode(token);

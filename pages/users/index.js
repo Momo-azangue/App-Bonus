@@ -9,7 +9,7 @@ const UserDashboard = () => {
             Dashboard Admin
           </Typography>
           <Typography>
-            Bienvenue dans le tableau de bord de l'administrateur.
+            Bienvenue dans le tableau de bord de l'utilisateur.
           </Typography>
         </Layout>
       );

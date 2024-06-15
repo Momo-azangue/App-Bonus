@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
-import { Typography, TextField, Button, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Modal, IconButton } from '@mui/material';
+import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Modal, TextField, Box, IconButton, CircularProgress } from '@mui/material';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
 import api from '../../config/axiosConfig';
 
-const rewards = () => {
+const RewardsPage = () => {
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [selectedReward, setSelectedReward] = useState(null);
-  const [openView, setOpenView] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [currentReward, setCurrentReward] = useState({ name: '', description: '', points: '', createdByName: '' });
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const fetchRewards = async () => {
@@ -24,222 +22,146 @@ const rewards = () => {
         setLoading(false);
       }
     };
-
     fetchRewards();
   }, []);
 
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
+  const handleOpenModal = (reward = { name: '', description: '', points: '', createdByName: '' }) => {
+    setCurrentReward(reward);
+    setIsEditMode(Boolean(reward.id));
+    setOpenModal(true);
   };
 
-  const handleOpenView = (reward) => {
-    setSelectedReward(reward);
-    setOpenView(true);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setCurrentReward({ name: '', description: '', points: '', createdByName: '' });
   };
 
-  const handleOpenEdit = (reward) => {
-    setSelectedReward(reward);
-    setOpenEdit(true);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentReward({ ...currentReward, [name]: value });
   };
 
-  const handleOpenDelete = (reward) => {
-    setSelectedReward(reward);
-    setOpenDelete(true);
-  };
-
-  const handleCloseView = () => {
-    setOpenView(false);
-    setSelectedReward(null);
-  };
-
-  const handleCloseEdit = () => {
-    setOpenEdit(false);
-    setSelectedReward(null);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDelete(false);
-    setSelectedReward(null);
-  };
-
-  const handleDelete = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await api.delete(`/api/rewards/${selectedReward.id}`);
-      setRewards(rewards.filter(reward => reward.id !== selectedReward.id));
-      handleCloseDelete();
+      if (isEditMode) {
+        await api.put(`/api/rewards/${currentReward.id}`, currentReward);
+      } else {
+        await api.post('/api/rewards', currentReward);
+      }
+      setRewards((prevRewards) => isEditMode ? prevRewards.map((reward) => (reward.id === currentReward.id ? currentReward : reward)) : [...prevRewards, currentReward]);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error saving reward:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/api/rewards/${id}`);
+      setRewards(rewards.filter((reward) => reward.id !== id));
     } catch (error) {
       console.error('Error deleting reward:', error);
     }
   };
 
-  const handleEditSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await api.put(`/api/rewards/${selectedReward.id}`, selectedReward);
-      setRewards(rewards.map(reward => (reward.id === selectedReward.id ? selectedReward : reward)));
-      handleCloseEdit();
-    } catch (error) {
-      console.error('Error updating reward:', error);
-    }
-  };
-
-  const handleChange = (event) => {
-    setSelectedReward({ ...selectedReward, [event.target.name]: event.target.value });
-  };
-
-  const filteredRewards = rewards.filter(reward => 
-    (reward.nom || '').toLowerCase().includes(search.toLowerCase()) || 
-    (reward.description || '').toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <Layout>
-      <Typography variant="h4" gutterBottom>
-        Récompenses
-      </Typography>
-      <TextField
-        label="Rechercher des récompenses..."
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={search}
-        onChange={handleSearchChange}
-      />
-      <Box>
-        <Button variant="contained" sx={{ mt: 2, bgcolor: 'black', '&:hover': { bgcolor: '#333533' } }}>
-          Ajouter une récompense
+      <Container>
+        <Typography variant="h4" gutterBottom>
+          Gestion des Récompenses
+        </Typography>
+        <Button variant="contained" color="primary" onClick={() => handleOpenModal()}>
+          Ajouter une Récompense
         </Button>
-      </Box>
-      {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper} sx={{ mt: 3 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Nom</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Points</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredRewards.map((reward) => (
-                <TableRow key={reward.id}>
-                  <TableCell>{reward.id}</TableCell>
-                  <TableCell>{reward.nom}</TableCell>
-                  <TableCell>{reward.description}</TableCell>
-                  <TableCell>{reward.points}</TableCell>
-                  <TableCell>
-                    <IconButton color="primary" onClick={() => handleOpenView(reward)}>
-                      <Visibility />
-                    </IconButton>
-                    <IconButton color="primary" onClick={() => handleOpenEdit(reward)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="secondary" onClick={() => handleOpenDelete(reward)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ mt: 3 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Nom</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Points</TableCell>
+                  <TableCell>Créé par</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      <Modal
-        open={openView}
-        onClose={handleCloseView}
-        aria-labelledby="modal-title-view"
-        aria-describedby="modal-description-view"
-      >
-        <Box sx={style}>
-          <Typography id="modal-title-view" variant="h6" component="h2">
-            Voir Récompense
-          </Typography>
-          {selectedReward && (
-            <Box>
-              <Typography variant="body1">Nom: {selectedReward.nom}</Typography>
-              <Typography variant="body1">Description: {selectedReward.description}</Typography>
-              <Typography variant="body1">Points: {selectedReward.points}</Typography>
-              <Button variant="contained" color="primary" onClick={handleCloseView}>Fermer</Button>
-            </Box>
-          )}
-        </Box>
-      </Modal>
-      <Modal
-        open={openEdit}
-        onClose={handleCloseEdit}
-        aria-labelledby="modal-title-edit"
-        aria-describedby="modal-description-edit"
-      >
-        <Box sx={style}>
-          <Typography id="modal-title-edit" variant="h6" component="h2">
-            Modifier Récompense
-          </Typography>
-          {selectedReward && (
-            <Box component="form" onSubmit={handleEditSubmit}>
+              </TableHead>
+              <TableBody>
+                {rewards.map((reward) => (
+                  <TableRow key={reward.id}>
+                    <TableCell>{reward.id}</TableCell>
+                    <TableCell>{reward.nom}</TableCell>
+                    <TableCell>{reward.description}</TableCell>
+                    <TableCell>{reward.points}</TableCell>
+                    <TableCell>{reward.createdByName}</TableCell>
+                    <TableCell>
+                      <IconButton color="primary" onClick={() => handleOpenModal(reward)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="secondary" onClick={() => handleDelete(reward.id)}>
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box sx={modalStyle}>
+            <Typography variant="h6" component="h2">
+              {isEditMode ? 'Modifier' : 'Ajouter'} une Récompense
+            </Typography>
+            <form onSubmit={handleSubmit}>
               <TextField
                 label="Nom"
-                variant="outlined"
+                name="name"
+                value={currentReward.name}
+                onChange={handleChange}
                 fullWidth
                 margin="normal"
-                name="nom"
-                value={selectedReward.nom}
-                onChange={handleChange}
+                required
               />
               <TextField
                 label="Description"
-                variant="outlined"
+                name="description"
+                value={currentReward.description}
+                onChange={handleChange}
                 fullWidth
                 margin="normal"
-                name="description"
-                value={selectedReward.description}
-                onChange={handleChange}
+                required
               />
               <TextField
                 label="Points"
-                variant="outlined"
+                name="points"
+                type="number"
+                value={currentReward.points}
+                onChange={handleChange}
                 fullWidth
                 margin="normal"
-                name="points"
-                value={selectedReward.points}
-                onChange={handleChange}
+                required
               />
-              <Button type="submit" variant="contained" color="primary">Enregistrer</Button>
-            </Box>
-          )}
-        </Box>
-      </Modal>
-      <Modal
-        open={openDelete}
-        onClose={handleCloseDelete}
-        aria-labelledby="modal-title-delete"
-        aria-describedby="modal-description-delete"
-      >
-        <Box sx={style}>
-          <Typography id="modal-title-delete" variant="h6" component="h2">
-            Supprimer Récompense
-          </Typography>
-          {selectedReward && (
-            <Box>
-              <Typography variant="body1">Voulez-vous vraiment supprimer la récompense {selectedReward.nom} ?</Typography>
-              <Box mt={3} display="flex" justifyContent="space-around">
-                <Button variant="contained" color="primary" onClick={handleDelete}>Oui</Button>
-                <Button variant="contained" color="secondary" onClick={handleCloseDelete}>Non</Button>
+              <Box mt={2}>
+                <Button type="submit" variant="contained" color="primary">
+                  {isEditMode ? 'Modifier' : 'Ajouter'}
+                </Button>
               </Box>
-            </Box>
-          )}
-        </Box>
-      </Modal>
+            </form>
+          </Box>
+        </Modal>
+      </Container>
     </Layout>
   );
 };
 
-const style = {
+const modalStyle = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -250,4 +172,4 @@ const style = {
   p: 4,
 };
 
-export default rewards;
+export default RewardsPage;
