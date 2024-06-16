@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // Remplacez par l'URL de votre API
+  baseURL: 'bonusapi-production.up.railway.app'  , //'http://localhost:8080', // Remplacez par l'URL de votre API
   headers: {
     'Content-Type': 'application/json',
   },

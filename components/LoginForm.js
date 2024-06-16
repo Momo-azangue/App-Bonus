@@ -15,7 +15,7 @@ const LoginForm = () => {
     const handleSubmit = async (event) => {
       event.preventDefault();
       try {
-          const response = await api.post('/api/auth/signin', { username, password });
+          const response = await api.post('auth/signin', { username, password });
   
           // Log the response data to inspect it
           console.log("Response data:", response.data);
