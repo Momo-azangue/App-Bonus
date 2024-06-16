@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
-import { Container, Box, Typography, Table, TableBody, TextField, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress ,Button, IconButton, Modal } from '@mui/material';
+import { Container, Box, Typography, Table, TableBody, TextField, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Button, IconButton, Modal } from '@mui/material';
 import axios from 'axios';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
 import api from '../../config/axiosConfig';
+import { format } from 'date-fns';
+
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [currentTransaction, setCurrentTransaction] = useState({ montant: '', type: '', statut: '', date: '', user: '' });
+  const [currentTransaction, setCurrentTransaction] = useState({ montant: '', type: '', statut: '' });
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -26,8 +28,7 @@ const Transactions = () => {
     fetchTransactions();
   }, []);
 
-
-  const handleOpenModal = (transaction = { montant: '', type: '', statut: '', date: '', user: '' }) => {
+  const handleOpenModal = (transaction = { montant: '', type: '', statut: '' }) => {
     setCurrentTransaction(transaction);
     setIsEditMode(Boolean(transaction.id));
     setOpenModal(true);
@@ -35,8 +36,9 @@ const Transactions = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setCurrentTransaction({ montant: '', type: '', statut: '', date: '', user: '' });
+    setCurrentTransaction({ montant: '', type: '', statut: '' });
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrentTransaction({ ...currentTransaction, [name]: value });
@@ -50,7 +52,13 @@ const Transactions = () => {
       } else {
         await api.post('/api/transactions/create-transcation', currentTransaction);
       }
-      setTransactions((prevTransactions) => isEditMode ? prevTransactions.map((transaction) => (transaction.id === currentTransaction.id ? currentTransaction : transaction)) : [...prevTransactions, currentTransaction]);
+      setTransactions((prevTransactions) =>
+        isEditMode
+          ? prevTransactions.map((transaction) =>
+              transaction.id === currentTransaction.id ? currentTransaction : transaction
+            )
+          : [...prevTransactions, currentTransaction]
+      );
       handleCloseModal();
     } catch (error) {
       console.error('Error saving transaction:', error);
@@ -66,6 +74,10 @@ const Transactions = () => {
     }
   };
 
+  const formatDateTime = (dateString) => {
+    return format(new Date(dateString), 'dd/MM/yyyy');
+  };
+
 
   return (
     <Layout>
@@ -74,7 +86,7 @@ const Transactions = () => {
           Transactions
         </Typography>
 
-        <Button variant="contained" color="primary" sx={{ backgroundColor:"black" }} onClick={() => handleOpenModal()}>
+        <Button variant="contained" color="primary" sx={{ backgroundColor: 'black' }} onClick={() => handleOpenModal()}>
           Ajouter une Transaction
         </Button>
 
@@ -103,8 +115,8 @@ const Transactions = () => {
                     <TableCell>{transaction.montant}</TableCell>
                     <TableCell>{transaction.type}</TableCell>
                     <TableCell>{transaction.statut}</TableCell>
-                    <TableCell>{transaction.date}</TableCell>
-                    <TableCell>{transaction.user}</TableCell>
+                    <TableCell>{formatDateTime(transaction.date)}</TableCell>
+                    <TableCell>{transaction.user ? `${transaction.user.nom} ${transaction.user.prenom}` : ''}</TableCell>
                     <TableCell>
                       <IconButton color="primary" onClick={() => handleOpenModal(transaction)}>
                         <Edit />
@@ -116,11 +128,11 @@ const Transactions = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>  
+            </Table>
           </TableContainer>
         )}
 
-<Modal open={openModal} onClose={handleCloseModal}>
+        <Modal open={openModal} onClose={handleCloseModal}>
           <Box sx={modalStyle}>
             <Typography variant="h6" component="h2">
               {isEditMode ? 'Modifier' : 'Ajouter'} une Transaction
@@ -154,26 +166,6 @@ const Transactions = () => {
                 margin="normal"
                 required
               />
-              <TextField
-                label="Date"
-                name="date"
-                type="date"
-                value={currentTransaction.date}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="Utilisateur"
-                name="user"
-                value={currentTransaction.user}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-              />
               <Box mt={2}>
                 <Button type="submit" variant="contained" color="primary">
                   {isEditMode ? 'Modifier' : 'Ajouter'}
@@ -182,11 +174,11 @@ const Transactions = () => {
             </form>
           </Box>
         </Modal>
-
       </Container>
     </Layout>
   );
 };
+
 const modalStyle = {
   position: 'absolute',
   top: '50%',

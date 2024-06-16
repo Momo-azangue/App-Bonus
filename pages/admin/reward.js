@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
-import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Modal, TextField, Box, IconButton, CircularProgress } from '@mui/material';
-import { Visibility, Edit, Delete } from '@mui/icons-material';
+import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Modal, Box, TextField, IconButton } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
 import api from '../../config/axiosConfig';
 
 const RewardsPage = () => {
   const [rewards, setRewards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
-  const [currentReward, setCurrentReward] = useState({ name: '', description: '', points: '', createdByName: '' });
+  const [currentReward, setCurrentReward] = useState({ name: '', description: '', points: 0 });
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const RewardsPage = () => {
     fetchRewards();
   }, []);
 
-  const handleOpenModal = (reward = { name: '', description: '', points: '', createdByName: '' }) => {
+  const handleOpenModal = (reward = { name: '', description: '', points: 0 }) => {
     setCurrentReward(reward);
     setIsEditMode(Boolean(reward.id));
     setOpenModal(true);
@@ -33,7 +33,7 @@ const RewardsPage = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setCurrentReward({ name: '', description: '', points: '', createdByName: '' });
+    setCurrentReward({ name: '', description: '', points: 0 });
   };
 
   const handleChange = (e) => {
@@ -47,9 +47,13 @@ const RewardsPage = () => {
       if (isEditMode) {
         await api.put(`/api/rewards/${currentReward.id}`, currentReward);
       } else {
-        await api.post('/api/rewards', currentReward);
+        await api.post('/api/rewards/create-reward', currentReward);
       }
-      setRewards((prevRewards) => isEditMode ? prevRewards.map((reward) => (reward.id === currentReward.id ? currentReward : reward)) : [...prevRewards, currentReward]);
+      setRewards((prevRewards) =>
+        isEditMode
+          ? prevRewards.map((reward) => (reward.id === currentReward.id ? currentReward : reward))
+          : [...prevRewards, currentReward]
+      );
       handleCloseModal();
     } catch (error) {
       console.error('Error saving reward:', error);
@@ -87,7 +91,6 @@ const RewardsPage = () => {
                   <TableCell>Nom</TableCell>
                   <TableCell>Description</TableCell>
                   <TableCell>Points</TableCell>
-                  <TableCell>Créé par</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -95,10 +98,9 @@ const RewardsPage = () => {
                 {rewards.map((reward) => (
                   <TableRow key={reward.id}>
                     <TableCell>{reward.id}</TableCell>
-                    <TableCell>{reward.nom}</TableCell>
+                    <TableCell>{reward.user ? `${reward.user.nom} ${reward.user.prenom}` : 'Utilisateur inconnu'}</TableCell>
                     <TableCell>{reward.description}</TableCell>
                     <TableCell>{reward.points}</TableCell>
-                    <TableCell>{reward.createdByName}</TableCell>
                     <TableCell>
                       <IconButton color="primary" onClick={() => handleOpenModal(reward)}>
                         <Edit />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Box, CircularProgress } from '@mui/material';
 import api from '../../config/axiosConfig';
+import ULayout from '../../components/components-user/ULayout';
 
 const Points = () => {
   const [points, setPoints] = useState(0);
@@ -9,8 +10,8 @@ const Points = () => {
   useEffect(() => {
     const fetchPoints = async () => {
       try {
-        const response = await api.get('/api/points');
-        setPoints(response.data.points);
+        const response = await api.get('/api/points/me');
+        setPoints(response.data);
       } catch (error) {
         console.error('Error fetching points:', error);
       } finally {
@@ -22,10 +23,12 @@ const Points = () => {
   }, []);
 
   return (
-    <Box>
-      <Typography variant="h5">Nombre de Points</Typography>
-      {loading ? <CircularProgress /> : <Typography variant="h4">{points}</Typography>}
-    </Box>
+    <ULayout>
+      <Box>
+        <Typography variant="h5">Nombre de Points</Typography>
+        {loading ? <CircularProgress /> : <Typography variant="h4">{points}</Typography>}
+      </Box>
+    </ULayout>
   );
 };
 

@@ -33,12 +33,13 @@ const LoginForm = () => {
   
           // Extraire les rôles depuis le token (utilisez une fonction pour décoder le JWT et obtenir les rôles)
           const roles = getRolesFromToken(accessToken);
+
   
           // Rediriger en fonction du rôle
-          if (roles.includes('ADMIN')) {
+          if (roles.includes('ROLE_ADMIN')) {
               router.push('/admin/dashboard');
           } else {
-              router.push('/admin/dashboard');
+              router.push('/user/dashboard');
           }
       } catch (error) {
           setError('Échec de la connexion. Vérifiez vos identifiants.');
@@ -48,11 +49,11 @@ const LoginForm = () => {
   
  
 
-    const getRolesFromToken = (token) => {
-        const decodedToken = jwtDecode(token);
-        return decodedToken.roles || [];
-    };
-
+  const getRolesFromToken = (token) => {
+    const decodedToken = jwtDecode(token);
+    console.log('Decoded Token:', decodedToken); // Debugging line
+    return decodedToken.roles.map(role => role.authority) || [];
+};
     return (
         <Container component="main" maxWidth="xs">
             <Box

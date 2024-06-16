@@ -1,6 +1,7 @@
 
 import ULayout from '../../components/components-user/ULayout';
 import { Typography } from '@mui/material';
+import withAuth from '../auth/withAuth';
 
 const UserDashboard = () => {
     return (
@@ -16,4 +17,4 @@ const UserDashboard = () => {
     };
     
 
-export default UserDashboard;
+export default  withAuth(UserDashboard, ['USER']);

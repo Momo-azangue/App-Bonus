@@ -3,6 +3,7 @@ import Layout from '../../components/Layout';
 import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Modal, TextField, Box, IconButton, CircularProgress } from '@mui/material';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
 import api from '../../config/axiosConfig';
+import { format } from 'date-fns';
 
 const PointsPage = () => {
   const [points, setPoints] = useState([]);
@@ -65,6 +66,10 @@ const PointsPage = () => {
     }
   };
 
+  const formatDateTime = (dateString) => {
+    return format(new Date(dateString), 'dd/MM/yyyy');
+  };
+
   return (
     <Layout>
       <Container>
@@ -95,8 +100,8 @@ const PointsPage = () => {
                   <TableRow key={point.id}>
                     <TableCell>{point.id}</TableCell>
                     <TableCell>{point.nombre}</TableCell>
-                    <TableCell>{point.date}</TableCell>
-                    <TableCell>{point.user}</TableCell>
+                    <TableCell>{formatDateTime(point.date)}</TableCell>
+                    <TableCell>{point.user ? `${point.user.nom} ${point.user.prenom}` : 'Utilisateur inconnu'}</TableCell>
                     <TableCell>
                       <IconButton color="primary" onClick={() => handleOpenModal(point)}>
                         <Edit />
@@ -138,15 +143,6 @@ const PointsPage = () => {
                 margin="normal"
                 required
                 InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="Utilisateur"
-                name="user"
-                value={currentPoint.user}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
               />
               <Box mt={2}>
                 <Button type="submit" variant="contained" color="primary">

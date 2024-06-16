@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Box, TextField } from '@mui/material';
 import api from '../../config/axiosConfig';
+import { format } from 'date-fns';
 
 const HistoriquePage = () => {
   const [historiques, setHistoriques] = useState([]);
@@ -31,6 +32,11 @@ const HistoriquePage = () => {
     (historique.description || '').toLowerCase().includes(search.toLowerCase()) ||
     (historique.type || '').toLowerCase().includes(search.toLowerCase())
   );
+
+  const formatDateTime = (dateString) => {
+    return format(new Date(dateString), 'dd/MM/yyyy');
+  };
+
 
   return (
     <Layout>
@@ -68,8 +74,8 @@ const HistoriquePage = () => {
                 {filteredHistoriques.map((historique) => (
                   <TableRow key={historique.id}>
                     <TableCell>{historique.id}</TableCell>
-                    <TableCell>{historique.user.nom}</TableCell>
-                    <TableCell>{historique.date}</TableCell>
+                    <TableCell>{historique.user?.nom}</TableCell>
+                    <TableCell>{formatDateTime(historique.date)}</TableCell>
                     <TableCell>{historique.type}</TableCell>
                     <TableCell>{historique.points}</TableCell>
                     <TableCell>{historique.montantTransaction}</TableCell>

@@ -24,7 +24,7 @@ const RegisterForm = () => {
         prenom,
         email,
         password,
-        roles: ["ADMIN"] // You can set roles dynamically based on the user's choice
+        roles: ["ROLE_ADMIN"] // You can set roles dynamically based on the user's choice
       });
 
       // Assuming the backend returns a JWT token upon successful registration
